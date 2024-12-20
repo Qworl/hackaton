@@ -6,8 +6,10 @@ from django.http import JsonResponse, HttpResponse
 from .models import Record
 from .forms import RecordForm
 
+
 async def connect():
     return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='127.0.0.1')
+
 
 def search(request):
     name_part = request.GET.get('name_part', '')
@@ -32,15 +34,19 @@ def search(request):
     }
 
     return render(request, 'myapp/search.html', context)
-    
+
+
 def get_record(request, pk):
-    record = Record(id=1, name='name', title='title', content='content')
-    data = {
-        'name': record.name,
-        'title': record.title,
-        'content': record.content,
-    }
-    return JsonResponse(data)
+    record = get_object_or_404(Record, id=pk)
+    if request.method == 'POST':
+        form = RecordForm(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            return redirect('search')
+    else:
+        form = RecordForm(instance=record)
+    return render(request, 'myapp/get_record.html', {'form': form})
+
 
 def update_record(request, pk):
     print('a')
