@@ -4,4 +4,4 @@ from .models import Record
 class RecordForm(forms.ModelForm):
     class Meta:
         model = Record
-        fields = ['name']
+        fields = ['id', 'name', 'title', 'content']

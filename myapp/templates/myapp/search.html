@@ -1,14 +1,109 @@
-<form method="get">
-  <input type="text" name="q" placeholder="Search by name">
-  <button type="submit">Search</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Records</title>
+    <style>
+        #sidebar {
+            display: none;
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #f9f9f9;
+            border-left: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        #recordForm {
+            display: flex;
+            flex-direction: column;
+        }
+        #recordForm label {
+            margin-bottom: 5px;
+        }
+        #recordForm input[type="text"],
+        #recordForm textarea {
+            margin-bottom: 15px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #recordForm button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #recordForm button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function openSidebar(recordId) {
+            fetch('/record/' + recordId)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('sidebar').style.display = 'block';
+                    document.getElementById('title').value = data.title;
+                    document.getElementById('content').value = data.content;
+                    document.getElementById('recordId').value = recordId;
+                });
+        }
+        
+        function saveRecord() {
+            const recordId = document.getElementById('recordId').value;
+            const formData = new FormData(document.getElementById('recordForm'));
+            
+            fetch('/update/' + recordId + '/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (response.status === 204) {
+                    document.getElementById('sidebar').style.display = 'none';
+                } else {
+                    alert('Failed to update record');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Search Records</h1>
+    <form method="get">
+        <input type="text" name="name_part" placeholder="Search by title">
+        <button type="submit">Search</button>
+    </form>
+    <ul>
+    {% for record in results %}
+        <li>
+            <a href="#" onclick="openSidebar({{record.pk}})">{{ record.name }}</a>
+        </li>
+    {% empty %}
+    <li>No records found</li>
+    {% endfor %}
+    </ul>
 
-<ul>
-  {% for record in results %}
-      <li>
-          <a href="{% url 'edit_record' record.id %}">{{ record.name }}</a>
-      </li>
-  {% empty %}
-      <li>No records found</li>
-  {% endfor %}
-</ul>
+    <div id="sidebar">
+        <h2>Edit Record</h2>
+        <form id="recordForm">
+            <input type="hidden" id="recordId">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required><br>
+            <label for="content">Content:</label>
+            <textarea id="content" name="content"></textarea><br>
+            <button type="button" onclick="saveRecord()">Save</button>
+        </form>
+    </div>
+</body>
+</html>
