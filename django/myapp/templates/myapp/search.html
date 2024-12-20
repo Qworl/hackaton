@@ -149,18 +149,37 @@
 <body>
     <h1>Search Records</h1>
     <form class="search-form" method="get">
-        <input type="text" name="name_part" placeholder="Search by title">
+        <input type="text" name="name_part" placeholder="Search by title" value="{{ name_part }}">
         <button type="submit">Search</button>
     </form>
     <ul class="record-list">
-    {% for record in results %}
+    {% for record in records %}
         <li>
             <a href="#" onclick="openSidebar({{record.pk}})">{{ record.name }}</a>
         </li>
     {% empty %}
-    <li>No records found</li>
+        <li>No records found.</li>
     {% endfor %}
     </ul>
+
+    <div class="pagination">
+      {% if records.has_previous %}
+          <a href="?name_part={{ name_part }}&offset={{ records.previous_page_number|add:-1 }}">Previous</a>
+      {% endif %}
+
+      {% for num, page_offset in pages_data %}
+          {% if records.number == num %}
+              <strong>{{ num }}</strong>
+          {% else %}
+              <a href="?name_part={{ name_part }}&offset={{ page_offset }}">{{ num }}</a>
+          {% endif %}
+      {% endfor %}
+
+      {% if records.has_next %}
+          <a href="?name_part={{ name_part }}&offset={{ records.next_page_number|add:-1 }}">Next</a>
+      {% endif %}
+    </div>
+
 
     <div id="sidebar">
         <button class="close-btn" onclick="closeSidebar()">×</button>
