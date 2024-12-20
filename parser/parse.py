@@ -6,7 +6,7 @@ URL = 'https://www.banki.ru/services/responses/list/ajax/'
 
 
 async def connect():
-    return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='127.0.0.1')
+    return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='postgres_db')
 
 
 def beauty_text(text: str) -> str:
@@ -59,8 +59,9 @@ async def parse():
  
         print(page)
         page += 1
+        await write_data(values)
 
-    await write_data(values)
+
 
 
 asyncio.run(parse())
