@@ -115,8 +115,9 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('sidebar').style.display = 'block';
-                    document.getElementById('title').value = data.title;
-                    document.getElementById('content').value = data.content;
+                    document.getElementById('feedback_type').value = data.feedback_type;
+                    document.getElementById('is_finance').value = data.is_finance;
+                    document.getElementById('subcategory_type').value = data.subcategory_type;
                     document.getElementById('recordId').value = recordId;
                 });
         }
@@ -155,7 +156,7 @@
     <ul class="record-list">
     {% for record in records %}
         <li>
-            <a href="#" onclick="openSidebar({{record.pk}})">{{ record.name }}</a>
+            <a href="#" onclick="openSidebar({{record.id}})">{{ record.title }}</a>
         </li>
     {% empty %}
         <li>No records found.</li>
@@ -186,10 +187,12 @@
         <h2>Edit Record</h2>
         <form id="recordForm">
             <input type="hidden" id="recordId">
-            <label for="title">Title:</label>
-            <input type="text" id="title" name="title" required><br>
-            <label for="content">Content:</label>
-            <textarea id="content" name="content"></textarea><br>
+            <label for="feedback_type">feedback_type:</label>
+            <input type="text" id="feedback_type" name="feedback_type" required><br>
+            <label for="is_finance">is_finance:</label>
+            <input type="text" id="is_finance" name="is_finance" required><br>
+            <label for="subcategory_type">subcategory_type:</label>
+            <input type="text" id="subcategory_type" name="subcategory_type" required><br>
             <button type="button" onclick="saveRecord()">Save</button>
         </form>
     </div>

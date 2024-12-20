@@ -3,15 +3,15 @@ import enum
 
 class Record(models.Model):
     id = int
-    title = str
-    text = str
+    title = models.TextField()
+    text = models.TextField()
     comment_id = int
     grade = int
     is_new = bool
     is_quailfied = bool
-    feedback_type = str
+    feedback_type = models.TextField()
     is_finance = bool
-    subcategory_type = str
+    subcategory_type = models.TextField()
 
 
     def __str__(self):
