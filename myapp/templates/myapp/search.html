@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <title>Search Records</title>
     <style>
+        body {
+            margin: 0;
+            padding: 20px; /* Отступы от края страницы для всего содержимого */
+            font-family: Arial, sans-serif;
+        }
+        form.search-form {
+            margin-bottom: 20px;
+        }
+        form.search-form input[type="text"] {
+            width: 70%; /* Длина поля ввода */
+            max-width: 500px; /* Максимальная ширина поля ввода */
+            padding: 10px;
+            margin-right: 10px; /* Отступ справа для кнопки поиска */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        form.search-form button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        form.search-form button:hover {
+            background-color: #0056b3;
+        }
         #sidebar {
             display: none;
             position: fixed;
@@ -44,6 +72,42 @@
         #recordForm button:hover {
             background-color: #0056b3;
         }
+        ul.record-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul.record-list li {
+            background-color: #f1f1f1;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        ul.record-list li:hover {
+            background-color: #e9e9e9;
+        }
+        ul.record-list a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background-color: #060606;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            line-height: 30px;
+            font-size: 18px;
+        }
     </style>
     <script>
         function openSidebar(recordId) {
@@ -55,6 +119,10 @@
                     document.getElementById('content').value = data.content;
                     document.getElementById('recordId').value = recordId;
                 });
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.display = 'none';
         }
         
         function saveRecord() {
@@ -80,11 +148,11 @@
 </head>
 <body>
     <h1>Search Records</h1>
-    <form method="get">
+    <form class="search-form" method="get">
         <input type="text" name="name_part" placeholder="Search by title">
         <button type="submit">Search</button>
     </form>
-    <ul>
+    <ul class="record-list">
     {% for record in results %}
         <li>
             <a href="#" onclick="openSidebar({{record.pk}})">{{ record.name }}</a>
@@ -95,6 +163,7 @@
     </ul>
 
     <div id="sidebar">
+        <button class="close-btn" onclick="closeSidebar()">×</button>
         <h2>Edit Record</h2>
         <form id="recordForm">
             <input type="hidden" id="recordId">
