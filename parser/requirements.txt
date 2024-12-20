@@ -1,0 +1,4 @@
+apscheduler
+asyncio
+asyncpg
+aiohttp
