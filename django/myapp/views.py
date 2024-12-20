@@ -89,7 +89,8 @@ async def update_record_impl(pk, feedback_type, is_finance, subcategory_type):
         UPDATE feedback SET
             feedback_type = $1,
             is_finance = $2,
-            subcategory_type = $3
+            subcategory_type = $3,
+            is_quailified = true
         WHERE id = $4;
     ''', feedback_type, is_finance, subcategory_type, pk)
     await conn.close()
