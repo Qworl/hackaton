@@ -1,3 +1,5 @@
+import os
+
 import asyncpg
 import spacy
 import transformers
@@ -10,7 +12,9 @@ nlp = spacy.load("ru_core_news_sm")
 
 
 async def connect():
-    return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='127.0.0.1')
+    return await asyncpg.connect(user=os.environ.get("POSTGRES_USER", "postgres"),
+                                 password=os.environ.get("POSTGRES_PASSWORD", "postgres"),
+    database='feedback', host='127.0.0.1')
 
 
 def extract_names(text: str):
