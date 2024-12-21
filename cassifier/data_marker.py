@@ -36,7 +36,7 @@ async def main():
                 Messages(role=MessagesRole.USER, content=value.get("title") + " " + value.get("text"))]))
             resp_json = json.loads(resp.choices[0].message.content)
             await conn.execute(
-                f'UPDATE {table_name} SET is_new = False, is_qualified = True, feedback_type = {resp_json["category"]},'
+                f'UPDATE {table_name} SET is_new = False, is_quailfied = True, feedback_type = {resp_json["category"]},'
                 f'is_finance = {resp_json["is_finance"]}, subcategory_type = {resp_json["sub_category"]} '
                 f'WHERE id = {value.get("id")}')
 

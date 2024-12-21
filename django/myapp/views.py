@@ -8,7 +8,7 @@ from .models import Record, Feedback, Subcategory
 from .forms import RecordForm
 
 async def connect():
-    return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='')
+    return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='postgres_db')
 
 async def get_all_records(search_string):
     conn = await connect()
@@ -30,7 +30,7 @@ async def get_all_records(search_string):
 def search(request):
     name_part = request.GET.get('name_part', '')
     offset = int(request.GET.get('offset', 0))
-    limit = 1
+    limit = 50
 
     records = asyncio.run(get_all_records(name_part.lower()))
 
@@ -90,7 +90,7 @@ async def update_record_impl(pk, feedback_type, is_finance, subcategory_type):
             feedback_type = $1,
             is_finance = $2,
             subcategory_type = $3,
-            is_quailified = true
+            is_quailfied = true
         WHERE id = $4;
     ''', feedback_type, is_finance, subcategory_type, pk)
     await conn.close()
