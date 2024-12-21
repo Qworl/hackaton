@@ -5,7 +5,7 @@ create table if not exists feedback (
     comment_id bigint not null UNIQUE,
     grade int not null,
     is_new boolean not null default true,
-    is_quailified boolean not null default false,
+    is_quailfied boolean not null default false,
     feedback_type integer,
     is_finance boolean,
     subcategory_type integer,

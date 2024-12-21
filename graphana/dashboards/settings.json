@@ -18,63 +18,37 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "ee7ipvutn2u4ga"
+        "uid": "de7kikhbk0fswf"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "dark-red",
+                "value": 1
+              },
+              {
+                "color": "#EAB839",
+                "value": 5
+              },
+              {
+                "color": "semi-dark-green",
+                "value": 8
               }
             ]
           }
@@ -87,25 +61,31 @@
         "x": 0,
         "y": 0
       },
-      "id": 4,
+      "id": 3,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "11.4.0",
       "targets": [
         {
           "editorMode": "code",
           "format": "table",
-          "rawSql": "",
+          "rawQuery": true,
+          "rawSql": "WITH categorized_data AS (\r\n    SELECT \r\n        subcategory_type,\r\n        COUNT(*) * 1.0 / SUM(COUNT(*)) OVER () AS category_ratio,\r\n        CASE \r\n            WHEN subcategory_type = 1 THEN 0.4\r\n            WHEN subcategory_type = 2 THEN 0.2\r\n            WHEN subcategory_type = 3 THEN 0.1\r\n            WHEN subcategory_type = 4 THEN 0.3\r\n            ELSE 0\r\n        END AS weight\r\n    FROM feedback\r\n    GROUP BY subcategory_type\r\n),\r\ncategory_contributions AS (\r\n    SELECT \r\n        SUM(category_ratio * weight) AS P\r\n    FROM categorized_data\r\n),\r\noverall_stats AS (\r\n    SELECT \r\n        COUNT(*) * 1.0 AS total_feedback,\r\n        SUM(CASE WHEN feedback_type = 1 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS S, -- Процент предложений\r\n        SUM(CASE WHEN feedback_type = 2 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS T, -- Процент благодарностей\r\n        (SELECT P FROM category_contributions) AS P -- Процент претензий\r\n    FROM feedback\r\n)\r\nSELECT \r\n    10 * (0.3 * S + 0.3 * T + 0.4 * (1 - P)) AS IKS\r\nFROM overall_stats;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -126,13 +106,13 @@
           }
         }
       ],
-      "title": "Panel Title",
-      "type": "timeseries"
+      "title": "Индекс клиентского сервиса",
+      "type": "stat"
     },
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "ee7ipvutn2u4ga"
+        "uid": "de7kikhbk0fswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -168,8 +148,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -207,9 +186,10 @@
             "type": "grafana-postgresql-datasource",
             "uid": "ee7ipvutn2u4ga"
           },
-          "editorMode": "builder",
+          "editorMode": "code",
           "format": "table",
-          "rawSql": "SELECT AVG(grade) FROM feedback LIMIT 50 ",
+          "rawQuery": true,
+          "rawSql": "SELECT AVG(grade) FROM feedback",
           "refId": "A",
           "sql": {
             "columns": [
@@ -243,27 +223,21 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "ee7ipvutn2u4ga"
+        "uid": "de7kikhbk0fswf"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
         },
         "overrides": []
       },
@@ -273,13 +247,14 @@
         "x": 0,
         "y": 8
       },
-      "id": 3,
+      "id": 4,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "pieType": "pie",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -287,9 +262,10 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "pluginVersion": "11.4.0",
       "targets": [
@@ -297,8 +273,124 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \r\n    CASE \r\n        WHEN (COUNT(*) FILTER (WHERE feedback_type IN (2, 3)) * 100.0 / COUNT(*)) > 25 THEN 10\r\n        WHEN (COUNT(*) FILTER (WHERE feedback_type = 1) * 100.0 / COUNT(*)) > 95 THEN 1\r\n        ELSE ROUND(10 - (COUNT(*) FILTER (WHERE feedback_type = 1) * 10.0 / COUNT(*)))\r\n    END AS customer_service_index\r\nFROM feedback;\r\n",
+          "rawSql": "SELECT COUNT(*) as \"Не применимо\" FROM feedback WHERE subcategory_type = 0;",
           "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "de7kikhbk0fswf"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Ошибка сотрудника\" FROM feedback WHERE subcategory_type = 1;",
+          "refId": "B",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "de7kikhbk0fswf"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Несолгласие с тарифами\" FROM feedback WHERE subcategory_type = 2;",
+          "refId": "C",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "de7kikhbk0fswf"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Технический сбой\" FROM feedback WHERE subcategory_type = 3;",
+          "refId": "D",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "de7kikhbk0fswf"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Скоростью обслуживания\" FROM feedback WHERE subcategory_type = 4;",
+          "refId": "E",
           "sql": {
             "columns": [
               {
@@ -318,13 +410,13 @@
           }
         }
       ],
-      "title": "Индекс клиентского сервиса",
-      "type": "stat"
+      "title": "Подкатегории отзывов",
+      "type": "piechart"
     },
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "ee7ipvutn2u4ga"
+        "uid": "de7kikhbk0fswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -343,7 +435,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 12,
         "y": 8
@@ -377,7 +469,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT is_finance, COUNT(*) FROM feedback GROUP BY is_finance;",
+          "rawSql": "SELECT COUNT(*) AS \"Финансовый вопрос\" FROM feedback WHERE is_finance IS TRUE;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -403,9 +495,174 @@
             "limit": 50
           },
           "table": "feedback"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "de7kikhbk0fswf"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Не финансовый вопрос\" FROM feedback WHERE is_finance IS FALSE;",
+          "refId": "B",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "feedback"
         }
       ],
       "title": "Группировка по категориям",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "de7kikhbk0fswf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Претензия\" FROM feedback WHERE feedback_type = 1;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "de7kikhbk0fswf"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Благодарность\" FROM feedback WHERE feedback_type = 2;",
+          "refId": "B",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "de7kikhbk0fswf"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) as \"Предложение\" FROM feedback WHERE feedback_type = 3;",
+          "refId": "C",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Претензии, предложения и благодарности",
       "type": "piechart"
     }
   ],
@@ -416,13 +673,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
-    "to": "now"
+    "from": "2024-12-21T03:41:31.113Z",
+    "to": "2024-12-21T15:41:31.113Z"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "PSB Dashboard",
   "uid": "be7iqxn261bswf",
-  "version": 5,
+  "version": 15,
   "weekStart": ""
 }

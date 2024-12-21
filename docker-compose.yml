@@ -36,7 +36,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./grafana:/etc/grafana/provisioning
+      - ./graphana:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana
 
   django:
@@ -54,3 +54,4 @@ services:
 
 volumes:
   postgres_data:
+  grafana_data:

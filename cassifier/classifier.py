@@ -301,7 +301,7 @@ async def main():
             content = value.get("content")
             category, subcategory, finance_related = classify_feedback(title, content)
             await con.execute(
-                f'UPDATE {table_name} SET is_new = False, is_qualified = True, feedback_type = {category.value()},'
+                f'UPDATE {table_name} SET is_new = False, is_quailfied = True, feedback_type = {category.value()},'
                 f'is_finance = {finance_related}, subcategory_type = {subcategory.value()} WHERE id = {record_id}')
     finally:
         if con:

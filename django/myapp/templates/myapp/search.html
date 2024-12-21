@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Search Records</title>
+    <title>Поиск отзывов</title>
     <style>
         body {
             margin: 0;
@@ -108,6 +108,70 @@
             line-height: 30px;
             font-size: 18px;
         }
+        input[readonly] {
+            background-color: #f0f0f0; /* Light-gray background for readonly */
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;  /* уменьшено с 60px */
+            height: 20px; /* уменьшено с 34px */
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px; /* уменьшено в соответствии с высотой */
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px; /* уменьшено с 26px */
+            width: 14px;  /* уменьшено с 26px */
+            left: 3px;    /* смещение уменьшено в связи с уменьшением размера */
+            bottom: 3px;  /* смещение уменьшено в связи с уменьшением размера */
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px); /* смещено в соответствии с новым размером */
+        }
     </style>
     <script>
         function openSidebar(recordId) {
@@ -115,6 +179,7 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('sidebar').style.display = 'block';
+                    document.getElementById('text').value = data.text;
                     document.getElementById('feedback_type').value = data.feedback_type;
                     document.getElementById('is_finance').value = data.is_finance;
                     document.getElementById('subcategory_type').value = data.subcategory_type;
@@ -148,10 +213,10 @@
     </script>
 </head>
 <body>
-    <h1>Search Records</h1>
+    <h1>Поиск отзывов</h1>
     <form class="search-form" method="get">
-        <input type="text" name="name_part" placeholder="Search by title" value="{{ name_part }}">
-        <button type="submit">Search</button>
+        <input type="text" name="name_part" placeholder="Искать по тексту или заголовку отзыва" value="{{ name_part }}">
+        <button type="submit">Поиск</button>
     </form>
     <ul class="record-list">
     {% for record in records %}
@@ -184,16 +249,47 @@
 
     <div id="sidebar">
         <button class="close-btn" onclick="closeSidebar()">×</button>
-        <h2>Edit Record</h2>
+        <h2>Изменить классификацию отзыва</h2>
         <form id="recordForm">
             <input type="hidden" id="recordId">
-            <label for="feedback_type">feedback_type:</label>
-            <input type="text" id="feedback_type" name="feedback_type" required><br>
-            <label for="is_finance">is_finance:</label>
-            <input type="text" id="is_finance" name="is_finance" required><br>
-            <label for="subcategory_type">subcategory_type:</label>
-            <input type="text" id="subcategory_type" name="subcategory_type" required><br>
-            <button type="button" onclick="saveRecord()">Save</button>
+            <label for="text">Текст отзыва:</label>
+            <textarea id="text" name="text" readonly></textarea><br>    
+            <!-- <label for="feedback_type">Тип фидбека:</label>
+            <input type="text" id="feedback_type" name="feedback_type"><br> -->
+
+            <div class="form-field">
+                <label for="feedback_type">Тип отзыва:</label>
+                <select id="feedback_type" name="feedback_type">
+                    <option value="" disabled selected>Выберите тип отзыва</option>
+                    <option value="Претензия">Претензия</option>
+                    <option value="Предложение">Предложение</option>
+                    <option value="Благодарность">Благодарность</option>
+                </select>
+            </div>
+
+            <div class="form-field toggle-container">
+                <label for="is_finance">Финансовый:</label>
+                <label class="switch">
+                    <input type="checkbox" id="is_finance" name="is_finance">
+                    <span class="slider"></span>
+                </label>    
+            </div>    
+            
+            <!-- <label for="subcategory_type">Подкатегория:</label>
+            <input type="text" id="subcategory_type" name="subcategory_type"><br> -->
+
+            <div class="form-field">
+                <label for="subcategory_type">Подкатегория отзыва:</label>
+                <select id="subcategory_type" name="subcategory_type">
+                    <option value="" disabled selected>Выберите подкатегорию отзыва</option>
+                    <option value="Ошибка_сотрудника">Ошибка сотрудника</option>
+                    <option value="Несогласие_с_тарифами">Несогласие с тарифами</option>
+                    <option value="Технический_сбой">Технический сбой</option>
+                    <option value="Скорость_обслуживания">Скорость обслуживания</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="saveRecord()">Сохранить</button>
         </form>
     </div>
 </body>
