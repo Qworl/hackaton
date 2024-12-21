@@ -8,7 +8,7 @@ from .forms import RecordForm
 
 
 async def connect():
-    return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='127.0.0.1')
+    return await asyncpg.connect(user='postgres', password='postgres', database='feedback', host='')
 
 
 def search(request):
