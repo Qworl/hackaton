@@ -98,8 +98,10 @@ async def update_record_impl(pk, feedback_type, is_finance, subcategory_type):
 
 def update_record(request, pk):
     post_data = request.POST
-    feedback_type = Feedback[post_data.get('feedback_type')].value
+
+    feedback_type = Feedback[post_data.get('feedback_type', 'Претензия')].value
     is_finance = True if post_data.get('is_finance', 'false').lower() == 'true' else False
-    subcategory_type = Subcategory[post_data.get('subcategory_type')].value
+    subcategory_type = Subcategory[post_data.get('subcategory_type', 'Ошибка_сотрудника')].value
+
     asyncio.run(update_record_impl(pk, feedback_type, is_finance, subcategory_type))
     return HttpResponse(status=204)
